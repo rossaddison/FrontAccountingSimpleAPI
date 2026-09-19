@@ -433,10 +433,19 @@ if (assets_supported()) {
 $rest->container->singleton('sales', function () {
     return new Sales();
 });
+$rest->container->singleton('documentLookup', function () {
+    return new \FAAPI\Sales\Http\DocumentLookupController(
+        new \FAAPI\Sales\Application\FindDocumentByMemoHandler(
+            new \FAAPI\Sales\Infrastructure\FaDocumentLocator()
+        )
+    );
+});
 $rest->group('/sales', function () use ($rest) {
     // Find a document by trans_type and comments (must precede /:trans_type/)
     $rest->get('/lookup/', function () use ($rest) {
-        $rest->sales->lookup($rest);
+        $result = $rest->documentLookup->handle($rest->request()->get());
+        $rest->response()->status($result->status);
+        $rest->response()->body(json_encode($result->body));
     });
     // Get Sales Header and Details
     $rest->get('/:trans_no/:trans_type', function ($trans_no, $trans_type) use ($rest) {

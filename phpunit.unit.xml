@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fast unit tests for the DDD components under src/Sales. They need neither a
+     FrontAccounting install nor a database. Requires PHPUnit 10 or newer and
+     PHP 8.2+, e.g. run with another project's phpunit binary:
+       php /path/to/vendor/bin/phpunit -c phpunit.unit.xml -->
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    failOnWarning="true"
+    failOnRisky="true"
+    failOnDeprecation="true"
+    failOnNotice="true"
+    displayDetailsOnTestsThatTriggerDeprecations="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
