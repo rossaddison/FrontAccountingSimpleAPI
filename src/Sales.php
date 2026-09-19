@@ -37,7 +37,7 @@ class Sales
     {
         // $_GET, not $rest->request()->get(): FrontAccounting's
         // html_cleanup($_SERVER) turns "&" in QUERY_STRING into "&amp;",
-        // which Slim then parses as a parameter called "amp;comments".
+        // which would then parse as a parameter called "amp;comments".
         $type = (int) ($_GET['trans_type'] ?? 0);
         $memo = (string) ($_GET['comments'] ?? '');
         if ($type === 0 || $memo === '') {

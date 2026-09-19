@@ -7,7 +7,7 @@ Free software under GNU GPL
 
 function api_login()
 {
-    $app = \Slim\Slim::getInstance('SASYS');
+    $app = \FAAPI\Http\App::getInstance('SASYS');
     $app->hook('slim.before', function () use ($app) {
         $req = $app->request();
         $company = $req->headers('X-COMPANY');
@@ -30,7 +30,7 @@ function api_login()
 
 function api_response($code, $body)
 {
-    $app = \Slim\Slim::getInstance('SASYS');
+    $app = \FAAPI\Http\App::getInstance('SASYS');
     $app->response()->status($code);
     if (is_array($body)) {
         $body= json_encode($body);
@@ -40,21 +40,21 @@ function api_response($code, $body)
 
 function api_success_response($body)
 {
-    $app = \Slim\Slim::getInstance('SASYS');
+    $app = \FAAPI\Http\App::getInstance('SASYS');
     api_response(200, $body);
     //$app->response()->['Content-Type'] = $content_type;
 }
 
 function api_create_response($body)
 {
-    $app = \Slim\Slim::getInstance('SASYS');
+    $app = \FAAPI\Http\App::getInstance('SASYS');
     api_response(201, $body);
     //$app->response()->['Content-Type'] = $content_type;
 }
 
 function api_error($code, $msg)
 {
-    $app = \Slim\Slim::getInstance('SASYS');
+    $app = \FAAPI\Http\App::getInstance('SASYS');
     $app->halt($code, json_encode(array('code' => $code, 'success' => 0, 'msg' => $msg)));
 }
 

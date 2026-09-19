@@ -267,7 +267,7 @@ class Customers
         }
 
         // ?debtor_ref=... returns just that customer, unpaginated. Read from
-        // $_GET: html_cleanup($_SERVER) breaks Slim's own query parsing when
+        // $_GET: html_cleanup($_SERVER) escapes QUERY_STRING when
         // there is more than one parameter.
         $debtorRef = isset($_GET['debtor_ref']) ? (string) $_GET['debtor_ref'] : '';
         if ($debtorRef !== '') {

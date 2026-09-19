@@ -35,7 +35,7 @@ function assets_get($id)
 function assets_add()
 {
 
-	$app = \Slim\Slim::getInstance('SASYS');
+	$app = \FAAPI\Http\App::getInstance('SASYS');
 	$req = $app->request();
 	$info = $req->post();
 

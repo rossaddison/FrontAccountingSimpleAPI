@@ -98,7 +98,7 @@ class Inventory
 
     public function inventory_add()
     {
-        $app = \Slim\Slim::getInstance('SASYS');
+        $app = \FAAPI\Http\App::getInstance('SASYS');
         $req = $app->request();
         $info = $req->post();
 
@@ -175,7 +175,7 @@ class Inventory
 
     public function inventory_edit($id)
     {
-        $app = \Slim\Slim::getInstance('SASYS');
+        $app = \FAAPI\Http\App::getInstance('SASYS');
         $req = $app->request();
         $info = $req->post();
 
@@ -246,7 +246,7 @@ class Inventory
 
     public function inventory_delete($id)
     {
-        $app = \Slim\Slim::getInstance('SASYS');
+        $app = \FAAPI\Http\App::getInstance('SASYS');
         $req = $app->request();
         $info = $req->post();
 

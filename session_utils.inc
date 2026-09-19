@@ -312,7 +312,7 @@ function set_page_security($value=null, $trans = array(), $gtrans = array())
 //
 function strip_quotes($data)
 {
-	if(get_magic_quotes_gpc()) {
+	if (false) { // magic quotes were removed in PHP 8
 		if(is_array($data)) {
 			foreach($data as $k => $v) {
 				$data[$k] = strip_quotes($data[$k]);

@@ -173,7 +173,7 @@ class Journal
         $i = 0;
         while ($row = db_fetch_assoc($result)) {
             if ($i == 0) {
-                if (!$info['trans_date']) {
+                if (empty($info['trans_date'])) {
                     $info['trans_date'] = $row['tran_date'];
                 }
                 $info['reference'] = $row['reference'];

@@ -1,12 +1,15 @@
 <?php
-// Slim 2.x still calls this; it was removed in PHP 8.0 and magic quotes are
-// always off there, so false is the correct answer.
-if (!function_exists('get_magic_quotes_gpc')) {
-    function get_magic_quotes_gpc(): bool
-    {
-        return false;
-    }
-}
+// Captured before FrontAccounting's session code runs: it HTML-escapes
+// $_SERVER, $_GET and $_POST in place, which corrupts query strings and values.
+$faapiRaw = array(
+    'method' => isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET',
+    'uri' => isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/',
+    'script' => isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
+    'path_info' => isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '',
+    'query' => isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '',
+    'body' => (string) file_get_contents('php://input'),
+    'headers' => function_exists('getallheaders') ? getallheaders() : array(),
+);
 
 use FAAPI\Inventory;
 use FAAPI\InventoryLocations;
@@ -69,11 +72,7 @@ include_once(API_ROOT . "/util.php");
 include_once(FA_ROOT . "/includes/date_functions.inc");
 include_once(FA_ROOT . "/includes/data_checks.inc");
 
-$rest = new \Slim\Slim(array(
-    'log.enabled' => true,
-    'mode' => 'debug',
-    'debug' => true
-));
+$rest = new \FAAPI\Http\App(array('debug' => true), $faapiRaw);
 $rest->setName('SASYS');
 
 // API Login Hook
@@ -82,25 +81,6 @@ api_login();
 $req = $rest->request();
 
 define("RESULTS_PER_PAGE", 2);
-
-class JsonToFormData extends \Slim\Middleware
-{
-    public function call()
-    {
-        $env = $this->app->environment();
-        if (is_array($env['slim.input'])) {
-            $env['slim.request.form_hash'] = $env['slim.input'];
-        }
-        $this->next->call();
-    }
-}
-
-/*
-The order of these 'add' calls is important, the JsonToFormData must be the
-second Middleware called, which means it needs to be added first.
-*/
-$rest->add(new JsonToFormData());
-$rest->add(new \Slim\Middleware\ContentTypes());
 
 // API Routes
 // ---------------------------------- Items -----------------------------------

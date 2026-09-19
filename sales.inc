@@ -246,7 +246,7 @@ function sales_get($trans_no, $trans_type) {
 }
 
 function sales_add() {
-	$app	= \Slim\Slim::getInstance('SASYS');
+	$app	= \FAAPI\Http\App::getInstance('SASYS');
 	$req	= $app->request();
 	$info	= $req->post();
 
@@ -361,10 +361,6 @@ function sales_add() {
   	case ST_CUSTCREDIT:
   		$feeback_response = sprintf(_("Credit Note # %d has been processed."), key($cart->trans_no));
 
-  		if ($cfdi_response != "") {
-  			$feeback_response .= "\r\n".$cfdi_response;
-  		}
-
   		api_success_response($feeback_response);
   		return;
   		break;
@@ -378,7 +374,7 @@ function sales_add() {
 }
 
 function sales_edit($trans_no, $trans_type) {
-	$app	= \Slim\Slim::getInstance('SASYS');
+	$app	= \FAAPI\Http\App::getInstance('SASYS');
 	$req	= $app->request();
 	$info	= $req->put();
 
