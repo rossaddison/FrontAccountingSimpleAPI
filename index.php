@@ -440,10 +440,24 @@ $rest->container->singleton('documentLookup', function () {
         )
     );
 });
+$rest->container->singleton('documentVoid', function () {
+    return new \FAAPI\Sales\Http\VoidDocumentController(
+        new \FAAPI\Sales\Application\VoidDocumentHandler(
+            new \FAAPI\Sales\Infrastructure\FaDocumentStateReader(),
+            new \FAAPI\Sales\Infrastructure\FaDocumentVoider()
+        )
+    );
+});
 $rest->group('/sales', function () use ($rest) {
     // Find a document by trans_type and comments (must precede /:trans_type/)
     $rest->get('/lookup/', function () use ($rest) {
         $result = $rest->documentLookup->handle($rest->request()->get());
+        $rest->response()->status($result->status);
+        $rest->response()->body(json_encode($result->body));
+    });
+    // Void an invoice, credit note or customer payment
+    $rest->post('/void/', function () use ($rest) {
+        $result = $rest->documentVoid->handle($rest->request()->post());
         $rest->response()->status($result->status);
         $rest->response()->body(json_encode($result->body));
     });

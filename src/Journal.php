@@ -382,6 +382,13 @@ class Journal
 
         $msg = void_transaction($type, $id, Today(), _("Document void by api."));
 
+        // void_transaction() returns the reason as a string when it refuses,
+        // and false when it voided the document.
+        if (is_string($msg) && $msg !== '') {
+            \api_error(409, $msg);
+            return;
+        }
+
         \api_success_response(array('msg' => 'voided', 'id' => $id));
     }
 
