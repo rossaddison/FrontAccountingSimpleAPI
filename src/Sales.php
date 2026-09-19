@@ -17,6 +17,49 @@ namespace FAAPI;
  */
 class Sales
 {
+    /**
+     * Finds a non-voided document of one type by its memo (the `comments`
+     * value given at creation), so a caller can check "did I already post
+     * this" without knowing the FrontAccounting transaction number.
+     *
+     * @SWG\Get(
+     *     path="/sales/lookup",
+     *     summary="Find a sales document by trans_type and comments",
+     *     tags={"sales"},
+     *     operationId="lookupSale",
+     *     produces={"application/json"},
+     *     @SWG\Response(response=200, description="found: trans_no and reference"),
+     *     @SWG\Response(response=404, description="no such document"),
+     *     deprecated=false
+     * )
+     */
+    public function lookup($rest)
+    {
+        // $_GET, not $rest->request()->get(): FrontAccounting's
+        // html_cleanup($_SERVER) turns "&" in QUERY_STRING into "&amp;",
+        // which Slim then parses as a parameter called "amp;comments".
+        $type = (int) ($_GET['trans_type'] ?? 0);
+        $memo = (string) ($_GET['comments'] ?? '');
+        if ($type === 0 || $memo === '') {
+            \api_error(412, 'trans_type and comments are required');
+            return;
+        }
+
+        $sql = "SELECT dt.trans_no, dt.reference FROM " . TB_PREF . "debtor_trans dt"
+            . " JOIN " . TB_PREF . "comments c ON c.type = dt.type AND c.id = dt.trans_no"
+            . " LEFT JOIN " . TB_PREF . "voided v ON v.type = dt.type AND v.id = dt.trans_no"
+            . " WHERE dt.type = " . db_escape($type)
+            . " AND c.memo_ = " . db_escape($memo)
+            . " AND v.id IS NULL ORDER BY dt.trans_no DESC LIMIT 1";
+        $row = db_fetch(db_query($sql, 'could not look up the sales document'));
+
+        if (!$row) {
+            \api_error(404, 'Not found');
+            return;
+        }
+        \api_response(200, array('trans_no' => (int) $row['trans_no'], 'reference' => $row['reference']));
+    }
+
     // Get Items
     /**
      * @SWG\Get(

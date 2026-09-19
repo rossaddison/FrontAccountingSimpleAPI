@@ -454,6 +454,10 @@ $rest->container->singleton('sales', function () {
     return new Sales();
 });
 $rest->group('/sales', function () use ($rest) {
+    // Find a document by trans_type and comments (must precede /:trans_type/)
+    $rest->get('/lookup/', function () use ($rest) {
+        $rest->sales->lookup($rest);
+    });
     // Get Sales Header and Details
     $rest->get('/:trans_no/:trans_type', function ($trans_no, $trans_type) use ($rest) {
         $rest->sales->getById($rest, $trans_no, $trans_type);

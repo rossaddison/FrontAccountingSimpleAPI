@@ -250,8 +250,22 @@ function sales_add() {
 	$req	= $app->request();
 	$info	= $req->post();
 
+	// Accept ISO 8601 dates (as /journal and /payments do) as well as the
+	// user's own date format.
+	foreach (array('order_date', 'delivery_date') as $dateKey) {
+		if (isset($info[$dateKey]) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $info[$dateKey])) {
+			$info[$dateKey] = sql2date($info[$dateKey]);
+		}
+	}
+
 	$cart									= null;
 	$cart									= new Cart($info['trans_type'], 0);
+	// A blank or missing ref gets the next reference number for this
+	// document type, so callers need not know FrontAccounting's pattern.
+	global $Refs;
+	if (!isset($info['ref']) || $info['ref'] === '') {
+		$info['ref']			= $Refs->get_next($cart->trans_type, null, $info['order_date']);
+	}
 	$cart->reference			= $info['ref'];
 	$cart->Comments				= $info['comments'];
 	$cart->document_date	= $info['order_date'];
