@@ -45,7 +45,7 @@ class Sales
             return;
         }
 
-        $sql = "SELECT dt.trans_no, dt.reference FROM " . TB_PREF . "debtor_trans dt"
+        $sql = "SELECT dt.trans_no, dt.reference, (dt.ov_amount + dt.ov_gst + dt.ov_freight + dt.ov_freight_tax + dt.ov_discount) AS total FROM " . TB_PREF . "debtor_trans dt"
             . " JOIN " . TB_PREF . "comments c ON c.type = dt.type AND c.id = dt.trans_no"
             . " LEFT JOIN " . TB_PREF . "voided v ON v.type = dt.type AND v.id = dt.trans_no"
             . " WHERE dt.type = " . db_escape($type)
@@ -57,7 +57,11 @@ class Sales
             \api_error(404, 'Not found');
             return;
         }
-        \api_response(200, array('trans_no' => (int) $row['trans_no'], 'reference' => $row['reference']));
+        \api_response(200, array(
+            'trans_no' => (int) $row['trans_no'],
+            'reference' => $row['reference'],
+            'total' => round((float) $row['total'], 2),
+        ));
     }
 
     // Get Items

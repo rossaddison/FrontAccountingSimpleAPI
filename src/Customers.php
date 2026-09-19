@@ -116,7 +116,7 @@ class Customers
         $selected_id = db_insert_id();
         $auto_create_branch = 1;
         if (isset($auto_create_branch) && $auto_create_branch == 1) {
-            add_branch($selected_id, $info['name'], $info['debtor_ref'], $info['address'], $info['salesman'], $info['area'], $info['tax_group_id'], '1', get_company_pref('default_sales_discount_act'), get_company_pref('debtors_act'), get_company_pref('default_prompt_payment_act'), $info['location'], $info['address'], 0, 0, $info['ship_via'], $info['notes']);
+            add_branch($selected_id, $info['name'], $info['debtor_ref'], $info['address'], $info['salesman'], $info['area'], $info['tax_group_id'], '', get_company_pref('default_sales_discount_act'), get_company_pref('debtors_act'), get_company_pref('default_prompt_payment_act'), $info['location'], $info['address'], 0, 0, $info['ship_via'], $info['notes']);
 
             $selected_branch = db_insert_id();
 
@@ -266,7 +266,15 @@ class Customers
             $from = 0;
         }
 
-        $sql = "SELECT * FROM " . TB_PREF . "debtors_master WHERE !inactive LIMIT " . $from . ", " . RESULTS_PER_PAGE;
+        // ?debtor_ref=... returns just that customer, unpaginated. Read from
+        // $_GET: html_cleanup($_SERVER) breaks Slim's own query parsing when
+        // there is more than one parameter.
+        $debtorRef = isset($_GET['debtor_ref']) ? (string) $_GET['debtor_ref'] : '';
+        if ($debtorRef !== '') {
+            $sql = "SELECT * FROM " . TB_PREF . "debtors_master WHERE !inactive AND debtor_ref = " . db_escape($debtorRef);
+        } else {
+            $sql = "SELECT * FROM " . TB_PREF . "debtors_master WHERE !inactive LIMIT " . $from . ", " . RESULTS_PER_PAGE;
+        }
 
         $query = db_query($sql, "error");
 
